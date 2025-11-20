@@ -22,8 +22,6 @@ FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
-ENV MODEL_HOST=http://localhost:8080
-
 # Copy the jar created in the build stage
 COPY --from=build /app/target/*.jar app.jar
 
