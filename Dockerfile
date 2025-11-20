@@ -1,7 +1,7 @@
 # ------------------------------
 # 1 - Build stage (compile JAR)
 # ------------------------------
-FROM maven:3.9.6-eclipse-temurin-25 AS build
+FROM maven:3.9.11-eclipse-temurin-25 AS build
 WORKDIR /app
 
 # Copy pom.xml and resolve dependencies first (better caching)
@@ -21,6 +21,8 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:25-jre
 
 WORKDIR /app
+
+ENV MODEL_HOST=http://localhost:8080
 
 # Copy the jar created in the build stage
 COPY --from=build /app/target/*.jar app.jar
