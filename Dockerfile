@@ -25,6 +25,10 @@ WORKDIR /app
 # Copy the jar created in the build stage
 COPY --from=build /app/target/*.jar app.jar
 
+# Set environment variables with defaults
+ENV APP_PORT=8080
+ENV MODEL_SERVICE_URL=""
+
 # Expose Spring Boot default port
 EXPOSE 8080
 

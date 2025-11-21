@@ -26,22 +26,23 @@ public class FrontendController {
 
     public FrontendController(RestTemplateBuilder rest, Environment env) {
         this.rest = rest;
-        this.modelHost = env.getProperty("MODEL_HOST");
+        // Support both MODEL_SERVICE_URL (F6) and MODEL_HOST (backward compatibility)
+        this.modelHost = env.getProperty("MODEL_SERVICE_URL", env.getProperty("MODEL_HOST"));
         assertModelHost();
     }
 
     private void assertModelHost() {
         if (modelHost == null || modelHost.strip().isEmpty()) {
-            System.err.println("ERROR: ENV variable MODEL_HOST is null or empty");
+            System.err.println("ERROR: ENV variable MODEL_SERVICE_URL (or MODEL_HOST) is null or empty");
             System.exit(1);
         }
         modelHost = modelHost.strip();
         if (modelHost.indexOf("://") == -1) {
-            var m = "ERROR: ENV variable MODEL_HOST is missing protocol, like \"http://...\" (was: \"%s\")\n";
+            var m = "ERROR: ENV variable MODEL_SERVICE_URL (or MODEL_HOST) is missing protocol, like \"http://...\" (was: \"%s\")\n";
             System.err.printf(m, modelHost);
             System.exit(1);
         } else {
-            System.out.printf("Working with MODEL_HOST=\"%s\"\n", modelHost);
+            System.out.printf("Working with MODEL_SERVICE_URL=\"%s\"\n", modelHost);
         }
     }
 
