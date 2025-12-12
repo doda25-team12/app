@@ -17,6 +17,14 @@
 		<java.version>25</java.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/doda25-team12/lib-version</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
