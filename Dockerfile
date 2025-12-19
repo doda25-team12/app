@@ -5,11 +5,19 @@ FROM maven:3.9.11-eclipse-temurin-25 AS build
 WORKDIR /app
 
 # Copy pom.xml and resolve dependencies first (better caching)
-COPY pom.xml .
+# When building from the repository root as the build context, copy files from the `app` folder
+# so the Docker build can access the application sources.
+COPY app/pom.xml .
+# Copy local `lib-version` module so we can install it into the image's local Maven repo
+# (the build context when invoking docker build will be the repository root)
+COPY lib-version ./lib-version
+RUN mvn -f lib-version/pom.xml -DskipTests install
+
+# Resolve dependencies (now including the locally installed lib-version)
 RUN mvn dependency:go-offline
 
 # Copy source code
-COPY src ./src
+COPY app/src ./src
 
 # Build the application JAR
 RUN mvn clean package -DskipTests
