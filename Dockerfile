@@ -4,8 +4,19 @@
 FROM maven:3.9.11-eclipse-temurin-25 AS build
 WORKDIR /app
 
-# Copy pom.xml and resolve dependencies first (better caching)
+# Copy pom.xml
 COPY pom.xml .
+
+# Copy and install lib-version dependency (not available in public repos)
+COPY lib-version-1.0.0-SNAPSHOT.jar /tmp/
+RUN mvn install:install-file \
+    -Dfile=/tmp/lib-version-1.0.0-SNAPSHOT.jar \
+    -DgroupId=doda25-team12 \
+    -DartifactId=lib-version \
+    -Dversion=1.0.0-SNAPSHOT \
+    -Dpackaging=jar
+
+# Resolve remaining dependencies
 RUN mvn dependency:go-offline
 
 # Copy source code
