@@ -3,11 +3,11 @@ name: Build and Release Container Image
 on:
   push:
     tags:
-      - 'v[0-9]*.[0-9]*.[0-9]*'  # Trigger on version tags like v1.0.0
-  workflow_dispatch:  # Allow manual triggering
+      - "v[0-9]*.[0-9]*.[0-9]*" # Trigger on version tags like v1.0.0
+  workflow_dispatch: # Allow manual triggering
     inputs:
       version:
-        description: 'Override version (leave empty to use pom.xml version)'
+        description: "Override version (leave empty to use pom.xml version)"
         required: false
         type: string
 
@@ -42,17 +42,17 @@ jobs:
             # This extracts the version from <version> tag in the root <project> element
             VERSION=$(grep -oP '(?<=<version>)[^<]+(?=</version>)' pom.xml | head -1 | sed 's/-SNAPSHOT//')
           fi
-          
+
           # Normalize version (remove SNAPSHOT suffix if present)
           VERSION=$(echo "$VERSION" | sed 's/-SNAPSHOT//')
-          
+
           # Validate version format
           if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-.*)?$ ]]; then
             echo "Error: Invalid version format: $VERSION"
             echo "Expected format: X.Y.Z or X.Y.Z-suffix"
             exit 1
           fi
-          
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
           echo "Using version: $VERSION"
@@ -91,10 +91,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            GITHUB_ACTOR=${{ github.actor }}
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
       - name: Output image information
         run: |
           echo "Image published: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
           echo "Version: ${{ steps.version.outputs.version }}"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
-
