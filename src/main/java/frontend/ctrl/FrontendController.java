@@ -62,16 +62,18 @@ public class FrontendController {
     @ResponseBody
     public Sms predict(@RequestBody Sms sms) {
         System.out.printf("Requesting prediction for \"%s\" ...\n", sms.sms);
-        sms.result = getPrediction(sms);
-        System.out.printf("Prediction: %s\n", sms.result);
+        Sms response = getPrediction(sms);
+        sms.result = response.result.trim();
+        sms.classifier = response.classifier;
+        System.out.printf("Prediction: %s (classifier: %s)\n", sms.result, sms.classifier);
         return sms;
     }
 
-    private String getPrediction(Sms sms) {
+    private Sms getPrediction(Sms sms) {
         try {
             var url = new URI(modelHost + "/predict");
             var c = rest.build().postForEntity(url, sms, Sms.class);
-            return c.getBody().result.trim();
+            return c.getBody();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
